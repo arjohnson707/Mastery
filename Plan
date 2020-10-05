@@ -1,0 +1,272 @@
+SCHEDULE
+    Monday:
+        [X]Review tasks
+        [X]Create plan
+        [X]Class Diagram
+        [X]Create a schedule
+
+    Tuesday:
+        [ ]Create packages (Models, Data, Domain, UI) - 30 minutes
+        [ ]Have Model classes completed - 30 minutes.
+        [ ]Data:
+            [ ]Make & test GuestFileRepository, GuestRepository, GuestFileRepositoryTest - 2 - 3 hours
+            [ ]Make & test HostFileRepository, Host Repository, HostFileRepositoryTest - 2 -3 hours
+            [ ]Make & test ReservationsFileRepository, ReservationsRepository, ReservationsFileRepositoryTest - 2 - 3 hours
+
+    Wednesday:
+        [ ]Progress Presentation - 10 - 15 minutes
+        [ ]Domain:
+            [ ] GuestService - 1 - 2 hours
+            [ ] GuestRepositoryDouble - 30 minutes
+            [ ] GuestServiceTest - 1 - 2 hours
+            [ ] HostService - 1 - 2 hours
+            [ ] HostRepositoryDouble - 30 minutes
+            [ ] HostServiceTest - 1 - 2 hours
+
+    Thursday:
+        [ ]Finish Domain
+            [ ] ReservationService - 2 - 3 hours
+            [ ] ReservationRepositoryDouble - 30 minutes
+            [ ] ReservationServiceTest - 1 - 2 hours
+        [ ]Create App, and xml config. files - 30 minutes
+        [ ]UI LAYER
+            [ ]ENUMS - MainMenuOptions
+    Friday:
+        [ ]Progress Presentation - 10 - 15 minutes
+        [ ]UI LAYER
+            [ ]Controller & View
+                [ ]Controller: run() - 15 minutes
+                [ ]Controller: runMenu() - 15-25 minutes
+                [ ]viewReservation() - 1 - 2 hours
+                [ ]makeReservation() - 2 - 3 hours
+                [ ]editReservation() - 2 - 3 hours
+                [ ]cancelReservation() - 2 - 3 hours
+
+    Saturday - Sunday:
+        [ ]Finish UI if needed
+        [ ]Refactor, hunt bugs, review test. Look for any missing tests via coverage.
+        [ ]Polish up
+
+
+
+REQUIREMENTS
+    Technical:
+        a) must be a maven project
+        b) Spring Dependency Injection configured with XML or annotations
+        c) All financial data must be in BigDecimal
+        d) Dates must be LocalDates only
+        e) all file data must be represented in models in the application
+        f) Reservation identifiers are unique per host, not unique across the entire application.
+            Effectively, the combination of a reservation identifier and a host identifier is required to uniquely identify a reservation.
+
+    General:
+        a) Everything must be THOROUGHLY tested. AKA doubles for domain, seed and test for data. Never use production data.
+
+
+    1) View reservations for Host (Read)
+        a) user needs to enter a value(s) to identify a host, or a list
+        b) if not found display message
+        c) if found but there are no reservations - display a message
+        d) display all reservations for a host
+        e) show useful info: guest, dates, totals, etc
+        f) sort in a meaningful way - AKA by date.
+
+    2) Make a reservation (add/Create)
+        a) user can enter a unique ID for guest, or search and pick out a name. (Maybe last name?)
+        b) user can enter a unique ID for host, or pick one out of a list. (Maybe ask for zipcode or state?)
+        c) show all FUTURE reservations for hosts, so admin can choose available dates.
+        d) Enter a start date
+        e) enter an end date
+        f) calculate total - based on host rate. Weekend rates do apply, so check to see if any days are weekend rates.
+        g) display total and ask for confirmation
+        h) if agreed to - see if the host ID already has a file, if not create a new file with the host ID.csv
+           VALIDATE:
+                1) Guest, host, start and end dates are REQUIRED
+                2) guess and host must EXIST
+                3) start date comes before end date
+                4) Reservations for location cannot overlap
+                5) start date must be in the future.
+
+    3) Edit a Reservation (Update)
+        a) find a reservation
+        b) Start and end date can be edited. No other data can be edited.
+        c) Recalculate the total, display a summary, and get confirmation.
+            VALIDATE:
+                1) Guest, Host, start and end dates are still required.
+                2) guess and host must EXIST
+                3) start date comes before end date
+                4) Reservations for location cannot overlap
+                5) start date must be in the future.
+
+    4) Cancel a Reservation (Delete)
+        a) find a reservation
+        b) only future reservations are shown
+        c) on success, display message
+            VALIDATE:
+                1) cannot cancel a reservation in the past (Can you cancel one's currently happening?)
+
+
+LAYER STRUCTURE
+    Models:
+        Classes:
+            Guest:
+                guest_id = Int. normal Id -> 1,2,3...etc
+                first_name = String - REQUIRED
+                last_name = String - REQUIRED
+                email = String - REQUIRED
+                phone = String - REQUIRED
+                state = String - REQUIRED
+
+            Host: (host and location are combined, the application enforces a limit on one Location per host.)
+                id = GUID, unique 36 characters long.
+                last_name = String
+                email = String
+                phone = String
+                address = String
+                city = String
+                state = String
+                postal_code = int
+                standard_rate = BigDecimal
+                weekend_rate = BigDecimal
+
+            Reservation:
+                id = Int. normal Id -> 1,2,3...etc
+                start_date = LocalDate
+                end_date = LocalDate
+                guest_id = Guest guest
+                total = BigDecimal
+
+    Data:
+        DataException: throwing all my exceptions here until Controller.
+
+        GuestFileRepository & GuestRepository
+             findAll
+             findByEmail
+             findByLastName
+
+             Currently not adding any new guests. so do not need an add, update, or delete.
+
+        HostFileRepository & HostRepository
+            findAll
+            findByEmail
+            findByState
+
+        ReservationFileRepository & ReservationRepository
+            findByHostId (look in the ./data/reservations location for the host ID.csv file)
+            add/create a new reservation
+            update (edit a reservation)
+            delete (cancel a reservation
+            writeall...either add it to an existing file, or create a new host file.
+
+    Domain:
+        GuestService
+            findAll
+            findByEmail
+            findByLastName
+
+        HostService
+            findAll
+            findByEmail
+            findByState
+
+        ReservationService (Gets the whole CRUD)
+            findByHostId
+
+            StreamMethod (?) to display information:
+
+            add/create a new reservation
+                VALIDATE:
+                     1) Guest, host, start and end dates are REQUIRED
+                     2) guess and host must EXIST
+                     3) start date comes before end date
+                     4) Reservations for location cannot overlap
+                     5) start date must be in the future.
+
+            update (edit a reservation)
+                VALIDATE:
+                     1) Guest, host, start and end dates are REQUIRED
+                     2) guess and host must EXIST
+                     3) start date comes before end date
+                     4) Reservations for location cannot overlap
+                     5) start date must be in the future.
+
+            delete (cancel a reservation)
+                VALIDATE:
+                     1) cannot cancel a reservation in the past (Can you cancel one's currently happening?)
+
+
+            validation steps for each; add, update, and delete
+
+    UI:
+        Controller
+            run
+                - try and catch where it will display any error messages thrown along the way.
+                - Calls on the menuDisplay method.
+                - will  say goodbye.
+
+            menuDisplay
+                - switch statement to display all menu options.
+                - within cases call on specific methods
+
+            viewReservation()
+                -display header
+                 a) user needs to enter a value(s) to identify a host, or a list
+                 b) if not found display message
+                 c) if found but there are no reservations - display a message
+                 d) display all reservations for a host
+
+
+            makeReservation()
+                -display header
+               a) user can enter a unique ID for guest, or search and pick out a name. (Maybe last name?)
+               b) user can enter a unique ID for host, or pick one out of a list. (Maybe ask for zipcode or state?)
+               c) show all FUTURE reservations for hosts, so admin can choose available dates.
+               d) Enter a start date
+               e) enter an end date
+               f) calculate total - based on host rate. Weekend rates do apply, so check to see if any days are weekend rates.
+               g) display total and ask for confirmation
+               h) if agreed to - see if the host ID already has a file, if not create a new file with the host ID.csv
+
+            editReservation()
+                -display header
+                a) find a reservation
+                b) Start and end date can be edited. No other data can be edited.
+                c) Recalculate the total, display a summary, and get confirmation.
+                    VALIDATE:
+                        1) Guest, Host, start and end dates are still required.
+                        2) guess and host must EXIST
+                        3) start date comes before end date
+                        4) Reservations for location cannot overlap
+                        5) start date must be in the future.
+
+            cancelReservation()
+                -display header
+                a) find a reservation
+                b) only future reservations are shown
+                c) on success, display message
+
+        View:
+            displayHeader
+
+        MainMenuOptions - ENUM
+                EXIT,
+                VIEW_RESERVATIONS,
+                MAKE_RESERVATION,
+                EDIT_RESERVATION,
+                CANCEL_RESERVATION
+
+
+    App:
+    calls on controller to run app.
+    Resources:
+        dependency-configuration.xml
+
+
+
+
+
+
+
+
+
+

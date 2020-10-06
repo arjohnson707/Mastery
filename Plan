@@ -4,13 +4,14 @@ SCHEDULE
         [X]Create plan
         [X]Class Diagram
         [X]Create a schedule
+        [X]Create a git Repository
 
     Tuesday:
-        [ ]Create packages (Models, Data, Domain, UI) - 30 minutes
-        [ ]Have Model classes completed - 30 minutes.
+        [X]Create packages (Models, Data, Domain, UI) - 30 minutes
+        [X]Have Model classes completed - 30 minutes.
         [ ]Data:
-            [ ]Make & test GuestFileRepository, GuestRepository, GuestFileRepositoryTest - 2 - 3 hours
-            [ ]Make & test HostFileRepository, Host Repository, HostFileRepositoryTest - 2 -3 hours
+            [X]Make & test GuestFileRepository, GuestRepository, GuestFileRepositoryTest - 2 - 3 hours ACTUALLY = 1 hour
+            [X]Make & test HostFileRepository, Host Repository, HostFileRepositoryTest - 2 -3 hours ACTUALLY = 1 hour
             [ ]Make & test ReservationsFileRepository, ReservationsRepository, ReservationsFileRepositoryTest - 2 - 3 hours
 
     Wednesday:
@@ -141,6 +142,7 @@ LAYER STRUCTURE
 
         GuestFileRepository & GuestRepository
              findAll
+             findById
              findByEmail
              findByLastName
 
@@ -148,8 +150,10 @@ LAYER STRUCTURE
 
         HostFileRepository & HostRepository
             findAll
+            findById
             findByEmail
             findByState
+            findByLastName
 
         ReservationFileRepository & ReservationRepository
             findByHostId (look in the ./data/reservations location for the host ID.csv file)
